@@ -48,7 +48,7 @@ def add_method(cls):
 from safrs import jsonapi_attr
 from abc import ABC
 class SAFRSBaseX(SAFRSBase):
-    """ injects to_dict() to remove _proper_salary_, and CheckSum """
+    """ injects to_dict() to remove _proper_salary_, and compute CheckSum """
     # @override
     def to_dict(self, *args, **kwargs):
         """
@@ -59,8 +59,9 @@ class SAFRSBaseX(SAFRSBase):
         """
         result = {}
         result["__checksum__"] = 62
+        remove_proper_salary = False
         for key, value in self._s_jsonapi_attrs.items():
-            if False and key.startswith("_") and key.endswith("_"):
+            if remove_proper_salary and key.startswith("_") and key.endswith("_"):
                 pass  # eg, remove __proper_salary__, not called on update
             else:
                 result[key] = value
@@ -69,22 +70,22 @@ class SAFRSBaseX(SAFRSBase):
     # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
     #@add_method(cls)
     @jsonapi_attr
-    def _check_sum_(self):  # type: ignore [no-redef]
+    def __check_sum__(self):  # type: ignore [no-redef]
         import database.models as models
         if isinstance(self, models.Employee):
-            return self.__check_sum__
+            return self.___check_sum___
         else:
             print("class")
             return None  # decimal.Decimal(10)
 
     #@add_method(cls)
-    @_check_sum_.setter
+    @__check_sum__.setter
     def check_sum__(self, value):  # type: ignore [no-redef]
-        self._check_sum_ = value
-        print(f'__check_sum__={self._check_sum_}')
+        self.__check_sum__ = value
+        print(f'___check_sum___={self.__check_sum__}')
         pass
 
-    CheckSum = _check_sum_
+    CheckSum = __check_sum__
     
 
 

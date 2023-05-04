@@ -1,10 +1,8 @@
 Optimistic locking is a valuable feature.  It is a blocker for companies who might otherwise migrate to API Logic Server from CA Live API Creator.  [This project](https://github.com/valhuber/opt_locking_mix) explores approaches. 
 
-Note: his project was named *_mix* since using mixins (multiple inheritance) appeared to be the preferred approach until the discovery of dynamic method addition.  It is still a useful vehicle for exploring data model mixins.
-
 &nbsp;
 
-## TL;DR - Compute virtual attribute `checksum` in `loaded_as_persistent`, verify on save
+## TL;DR - Compute virtual attribute `__check_sum__` in `loaded_as_persistent`, verify on save
 
 SQLAlchemy provides the `loaded_as_persistent` event, enabling us to compute the `check_sum`, store it in the row, and check it on update.
 
@@ -20,17 +18,23 @@ Declaring this *virtual attribute* is a key focus of this exploratory prototype.
 
 ## Event `loaded_as_persistent` (works)
 
-[This event](https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.loaded_as_persistent) looks like this:
+[This event](https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.loaded_as_persistent) looks like this (see `logic/sys_logic.py`):
 
 ```python
     @event.listens_for(session, `loaded_as_persistent`)
     def receive_loaded_as_persistent(session, instance):
         "listen for the 'loaded_as_persistent' event"
 
-        logger.debug(f'{__name__} - compute checksum')
+        logger.debug(f'{__name__} - compute __check_sum__')
 ```
 
-We can listen for it at server start.
+We set up the listener in `api_logic_server_run.py`.
+
+&nbsp;
+
+### Alternative: compute __check_sum__ in attr getter
+
+This should also work.
 
 &nbsp;
 
@@ -89,7 +93,34 @@ This can be resolved by overriding `SAFRSBase`, as illustrated in `database/mode
 
 &nbsp;
 
-### Other Options Considered
+## Check `__check_sum__` in logic - *FAILING*
+
+This is ***failing***, since jsonapi_attr values are not sent on `Patch`.
+
+To test:
+
+1. Set breakpoint @194 in `logic/declare_logic.py`
+2. Use Run Config `ApiLogicServer - No Security`
+3. Patch the following for **id 5**:
+
+```json
+{
+    "data": {
+        "attributes": {
+            "Salary": 200000,
+            "__check_sum__": 72,
+            "Proper_Salary": 50000,
+            "Id": 5},
+        "type": "Employee",
+        "id": 5
+    }
+}
+```
+---
+
+&nbsp;
+
+### Other Options Considered for `@json_attr` definition
 
 #### Option 1: In models.py (but rebuild issues)
 

@@ -75,7 +75,3 @@ def _proper_salary(self, value):  # type: ignore [no-redef]
 models.Employee.ProperSalary = __proper_salary__
       
 app_logger.info("..database/customize_models.py: models.Employee.Manager(manages), Employee.ProperSalary")
-
-# look at /People/?include=books_read.author.books_written
-# filter[Book.title] - see safrsbase, and base.py
-# override basemodel - see example
