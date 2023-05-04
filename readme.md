@@ -66,7 +66,7 @@ This is ***failing***, since jsonapi_attr values are not sent on `Patch`.  We ca
 
 1. Set breakpoint @194 in `logic/declare_logic.py`
 2. Use Run Config `ApiLogicServer - No Security`
-3. Patch the following for **id 5**:
+3. In Swagger, **Employee/Patch** the following for **id 5**:
 
 ```json
 {
@@ -83,6 +83,7 @@ This is ***failing***, since jsonapi_attr values are not sent on `Patch`.  We ca
 ```
 &nbsp;
 
+![No Virtual Attrs](images/patch_no_virtuals.png)
 ---
 
 &nbsp;
