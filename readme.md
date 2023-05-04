@@ -1,4 +1,4 @@
-Optimistic locking is a valuable feature.  It is a blocker for companies who might otherwise migrate to API Logic Server from CA Live API Creator.  [This project](https://github.com/valhuber/opt_locking_mix) explores approaches. 
+Optimistic locking is a valuable feature.  It is a blocker for companies who might otherwise migrate to API Logic Server from CA Live API Creator.  [This project](https://github.com/valhuber/opt_locking) explores approaches. 
 
 &nbsp;
 
@@ -8,11 +8,13 @@ SQLAlchemy provides the `loaded_as_persistent` event, enabling us to compute the
 
 Storing it in the row is critical because we do not want to maintain server state between client calls.  Nor do we want to force customers to include special fields in their schema.
 
-We want **virtual attributes** that can be computed on retrieval, not stored in the database, and attached to API rows as they are sent / returned from the client.
+We want **virtual attributes** that can be computed on retrieval, not stored in the database, and attached to API rows as they are sent / returned from the client.  The returned `__check_sum__` can then be tested (in logic) to make sure it was unchanged.
 
 For virtual attributes, we can use `@jsonapi_attr`.
 
 Declaring this *virtual attribute* is a key focus of this exploratory prototype.
+
+This works, ***except*** that the virtual attributes are not returned on Patch commands.  See "Failing", below.
 
 &nbsp;
 
@@ -52,52 +54,15 @@ See `add_method.py`, courtesy: https://mgarod.medium.com/dynamically-add-a-metho
 
 Appears to work, most preferable since requires no change to models.py (so can rebuild-from-database).
 
-Though, `proper_salary` appears as an attr:
+Though, `__proper_salary__` appears as an attr in json response.  
 
-```json
-{
-  "data": [
-    {
-      "attributes": {
-        "Address": "507 - 20th Ave. E. Apt. 2A",
-        "BirthDate": "1980-12-08",
-        "City": "Seattle",
-        "Country": "USA",
-        "Dues": null,
-        "EmployeeType": "Commissioned",
-        "Extension": "5467",
-        "FirstName": "Nancy",
-        "HireDate": "2024-05-01",
-        "HomePhone": "(206) 555-9857",
-        "Id": 1,
-        "LastName": "Davolio",
-        "Notes": "Education includes a BA in psychology from Colorado State University in 1970.  She also completed 'The Art of the Cold Call.'  Nancy is a member of Toastmasters International.",
-        "OnLoanDepartmentId": 1,
-        "PhotoPath": "Employee/davolio.jpg",
-        "PostalCode": "98122",
-        "ProperSalary": 113750,
-        "Region": "North America",
-        "ReportsTo": 2,
-        "Salary": 91000,
-        "Title": "Sales Representative",
-        "TitleOfCourtesy": "Ms.",
-        "UnionId": null,
-        "WorksForDepartmentId": 2,
-        "__proper_salary__": ""
-      }
-    }
-}
-```
-
-This can be resolved by overriding `SAFRSBase`, as illustrated in `database/models.py`.
+> This can be resolved by overriding `SAFRSBase`, as illustrated in `database/models.py`.
 
 &nbsp;
 
 ## Check `__check_sum__` in logic - *FAILING*
 
-This is ***failing***, since jsonapi_attr values are not sent on `Patch`.
-
-To test:
+This is ***failing***, since jsonapi_attr values are not sent on `Patch`.  We can test both `__check_sum__` and `Proper_Salary`, as follows:
 
 1. Set breakpoint @194 in `logic/declare_logic.py`
 2. Use Run Config `ApiLogicServer - No Security`
@@ -116,11 +81,17 @@ To test:
     }
 }
 ```
+&nbsp;
+
 ---
 
 &nbsp;
 
-### Other Options Considered for `@json_attr` definition
+### Appendix: Other Options Considered for `@json_attr` definition
+
+Skip this for now, it just documents other rejected approaches.
+
+&nbsp;
 
 #### Option 1: In models.py (but rebuild issues)
 
