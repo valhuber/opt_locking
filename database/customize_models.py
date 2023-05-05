@@ -80,7 +80,7 @@ def _chx_sum_(self):  # type: ignore [no-redef]
         try:
           return self._chx_sum_property
         except:
-          print(f'{__name__}: no _chx_sum_ in {self}')
+          print(f'{__name__}: ALERT (BKPT) -- no _chx_sum_property in {self}')
           return -1
     else:
         print("class")
