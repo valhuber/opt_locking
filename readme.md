@@ -4,21 +4,21 @@ Optimistic locking is a valuable feature.  It is a blocker for companies who mig
 
 ## TL;DR - Compute virtual attribute `__check_sum__` in `loaded_as_persistent`, verify on save
 
-SQLAlchemy provides the `loaded_as_persistent` event, enabling us to compute the `check_sum`, store it in the row, and check it on update.
-
-Storing it in the row is critical because we do not want to maintain server state between client calls.  Nor do we want to force customers to include special fields in their schema.
-
 We want **virtual attributes** that can be computed on retrieval, not stored in the database, and attached to API rows as they are sent / returned from the client.  The returned `__check_sum__` can then be tested (in logic) to make sure it was unchanged.
 
-For virtual attributes, we can use `@jsonapi_attr`.
+1. SQLAlchemy provides the `loaded_as_persistent` event, enabling us to compute the `check_sum`, store it in the row, and check it on update.
 
-Declaring this *virtual attribute* is a key focus of this exploratory prototype.
+    * Storing it in the row is critical because we do not want to maintain server state between client calls.  Nor do we want to force customers to include special fields in their schema.
 
-This works, ***except*** that the virtual attributes are not returned on Patch commands.  See "Failing", below.
+2. For virtual attributes, we can use `@jsonapi_attr`.
+
+3. Clients must include the read-checksum (virtual attribute) in the `Patch`
+
+4. Logic will verify that the read-checksum equals the current-checksum
 
 &nbsp;
 
-## Event `loaded_as_persistent` (works)
+## 1. Event `loaded_as_persistent` (works)
 
 [This event](https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.loaded_as_persistent) looks like this (see `logic/sys_logic.py`):
 
@@ -40,7 +40,7 @@ This might also work...?
 
 &nbsp;
 
-## safrs `@jsonapi_attr` (works - where to define?)
+## 2. safrs `@jsonapi_attr` (works - where to define?)
 
 This provides a mechanism to define attributes as part of the row (so it sent to / returned from the client), and not saved to disk.  
 
@@ -60,36 +60,14 @@ Though, `_check_sum_property` appears as an attr in json response.
 
 Additional choices remain - *where* to define:
 
-1. In `database/models.py` -- inline, in `Employees` **<=== seems to work??**
-2. In `database/models.py` -- in super class `SafrsBaseX` (test requires changes)
+1. In `database/models.py` -- **inline**, in `Employees` **<=== seems to work??**
+2. In `database/models.py` -- in super class `SafrsBaseX` (test requires changes, not done)
 3. In `database/customize_models.py`
 
-&nbsp;
+## 3. Clients include read-checksum in `Patch`
 
-## Check `__check_sum__` in logic - *FAILING*
+Set the breakpoint noted below, and use cURL (easiest) or swagger:
 
-This is ***failing***, since jsonapi_attr values are not sent on `Patch`.  We can test both `__check_sum__` and `Proper_Salary`, as follows:
-
-1. Set breakpoint @205 in `logic/declare_logic.py`
-2. Use Run Config `ApiLogicServer - No Security`
-3. In Swagger, **Employee/Patch** the following for **id 5**:
-
-```json
-{
-    "data": {
-        "attributes": {
-            "Salary": 200000,
-            "_chx_sum_property": 156,
-            "_check_sum_property": 56,
-            "ChkSum": 157,
-            "CheckSum": 57,
-            "Proper_Salary": 50000,
-            "Id": 5},
-        "type": "Employee",
-        "id": 5
-    }
-}
-```
 ```curl
 curl -X 'PATCH' \
   'http://localhost:5656/api/Employee/5/' \
@@ -111,12 +89,42 @@ curl -X 'PATCH' \
 }'
 ```
 
+Or, swagger payload:
+
+```json
+{
+    "data": {
+        "attributes": {
+            "Salary": 200000,
+            "_chx_sum_property": 156,
+            "_check_sum_property": 56,
+            "ChkSum": 157,
+            "CheckSum": 57,
+            "Proper_Salary": 50000,
+            "Id": 5},
+        "type": "Employee",
+        "id": 5
+    }
+}
+```
+
+&nbsp;
+
+## 4. Check `__check_sum__` in logic
+
+We can test the various strategies, as follows:
+
+1. Set breakpoint @205 in `logic/declare_logic.py`
+2. Use Run Config `ApiLogicServer - No Security`
+3. Simulate the client using the cURL above
+4. Observe the logged values - the **inline** approach appears to work
+
 ```log
 logic sees: chk_ChxSumProperty=155 chk_CheckSumProperty=57, chk_ChxSum=155, chk_CheckSum=57
 ```
 &nbsp;
 
-![No Virtual Attrs](images/patch_no_virtuals.png)
+![No Virtual Attrs](images/patch-virtuals.png)
 ---
 
 &nbsp;
