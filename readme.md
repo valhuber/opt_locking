@@ -23,11 +23,11 @@ This works, ***except*** that the virtual attributes are not returned on Patch c
 [This event](https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.loaded_as_persistent) looks like this (see `logic/sys_logic.py`):
 
 ```python
-    @event.listens_for(session, `loaded_as_persistent`)
-    def receive_loaded_as_persistent(session, instance):
-        "listen for the 'loaded_as_persistent' event"
-
-        logger.debug(f'{__name__} - compute __check_sum__')
+        elif isinstance(instance, models.Employee):
+            logger.debug(f'{__name__} - setting CheckSum in EMP instance: {instance}')
+            setattr(instance, "_chx_sum_property", 155)
+            setattr(instance, "_check_sum_property", 55)
+            # instance.CheckSum = 55  # later, figure out algorithm for this
 ```
 
 We set up the listener in `api_logic_server_run.py`.
@@ -36,7 +36,7 @@ We set up the listener in `api_logic_server_run.py`.
 
 ### Alternative: compute __check_sum__ in attr getter
 
-This should also work.
+This might also work...?
 
 &nbsp;
 
@@ -54,9 +54,14 @@ See `add_method.py`, courtesy: https://mgarod.medium.com/dynamically-add-a-metho
 
 Appears to work, most preferable since requires no change to models.py (so can rebuild-from-database).
 
-Though, `__proper_salary__` appears as an attr in json response.  
+Though, `_check_sum_property` appears as an attr in json response.  
 
 > This can be resolved by overriding `SAFRSBase`, as illustrated in `database/models.py`.
+
+Additional choices remain - *where* to define:
+1. In `database/customize_models.py`
+2. In `database/models.py` -- in super class `SafrsBaseX`
+3. In `database/models.py` -- inline, in `Employees`
 
 &nbsp;
 
@@ -73,13 +78,40 @@ This is ***failing***, since jsonapi_attr values are not sent on `Patch`.  We ca
     "data": {
         "attributes": {
             "Salary": 200000,
-            "__check_sum__": 72,
+            "_chx_sum_property": 156,
+            "_check_sum_property": 56,
+            "ChkSum": 157,
+            "CheckSum": 57,
             "Proper_Salary": 50000,
             "Id": 5},
         "type": "Employee",
         "id": 5
     }
 }
+```
+```curl
+curl -X 'PATCH' \
+  'http://localhost:5656/api/Employee/5/' \
+  -H 'accept: application/vnd.api+json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "data": {
+        "attributes": {
+            "Salary": 200000,
+            "_chx_sum_property": 156,
+            "_check_sum_property": 56,
+            "ChkSum": 157,
+            "CheckSum": 57,
+            "Proper_Salary": 50000,
+            "Id": 5},
+        "type": "Employee",
+        "id": 5
+    }
+}'
+```
+
+```log
+logic sees:chk_CheckSum=57, chk_ChxSum=155, chk_CheckSumProperty=57, chk_ChxSumProperty=155 
 ```
 &nbsp;
 

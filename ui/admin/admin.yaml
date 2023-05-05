@@ -185,18 +185,20 @@ resources:
         name: LastName
         search: true
         sort: true
-      - name: OnLoanDepartmentId
       - name: WorksForDepartmentId
       - name: Salary
         type: DECIMAL
       - name: ProperSalary
         type: DECIMAL
       - name: EmployeeType
+      - name: Id
+      - name: CheckSum
+      - name: ChxSum
       - name: Dues
         type: DECIMAL
         show_when: record["EmployeeType"] == "Hourly"
-      - name: Id
       - name: FirstName
+      - name: OnLoanDepartmentId
       - name: Title
       - name: TitleOfCourtesy
       - name: BirthDate

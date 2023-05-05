@@ -191,7 +191,17 @@ def declare_logic():
     """
     def raise_over_20_percent(row: models.Employee, old_row: models.Employee, logic_row: LogicRow):
         if logic_row.ins_upd_dlt == "upd" and row.Salary > old_row.Salary:
-            test = row.ProperSalary
+            chk_ProperSalary = row.ProperSalary
+            chk_CheckSum = row.CheckSum
+            chk_ChxSum = row.ChxSum
+            chk_CheckSumProperty = row._check_sum_property
+            chk_ChxSumProperty = row._chx_sum_property
+            print(f'logic sees:'
+                  f'chk_CheckSum={chk_CheckSum}, '
+                  f'chk_ChxSum={chk_ChxSum}, '
+                  f'chk_CheckSumProperty={chk_CheckSumProperty}, '
+                  f'chk_ChxSumProperty={chk_ChxSumProperty} '
+                  '')
             return row.Salary >= Decimal('1.20') * old_row.Salary
         else:
             return True

@@ -53,7 +53,6 @@ They must be manually added to your ui/admin/admin.yaml, e.g.
 @add_method(models.Employee)
 @jsonapi_attr
 def __proper_salary__(self):  # type: ignore [no-redef]
-    import database.models as models
     if isinstance(self, models.Employee):
         import decimal
         rtn_value = self.Salary
@@ -64,14 +63,36 @@ def __proper_salary__(self):  # type: ignore [no-redef]
         print("class")
         return None  # decimal.Decimal(10)
 
-
 @add_method(models.Employee)
 @__proper_salary__.setter
-def _proper_salary(self, value):  # type: ignore [no-redef]
+def __proper_salary__(self, value):  # type: ignore [no-redef]
     self._proper_salary = value
     print(f'_proper_salary={self._proper_salary}')
     pass
 
 models.Employee.ProperSalary = __proper_salary__
-      
+
+
+@add_method(models.Employee)
+@jsonapi_attr
+def _chx_sum_(self):  # type: ignore [no-redef]
+    if isinstance(self, models.Employee):
+        try:
+          return self._chx_sum_property
+        except:
+          print(f'{__name__}: no _chx_sum_ in {self}')
+          return -1
+    else:
+        print("class")
+        return None  # decimal.Decimal(10)
+
+@add_method(models.Employee)
+@_chx_sum_.setter
+def _chx_sum_(self, value):  # type: ignore [no-redef]
+    self._chx_sum_property = value
+    print(f'_chx_sum_={self._chx_sum_property}')
+    pass
+
+models.Employee.ChxSum = _chx_sum_
+
 app_logger.info("..database/customize_models.py: models.Employee.Manager(manages), Employee.ProperSalary")

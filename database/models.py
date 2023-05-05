@@ -58,7 +58,6 @@ class SAFRSBaseX(SAFRSBase):
         :return: dictionary with jsonapi attributes
         """
         result = {}
-        result["__checksum__"] = 62
         remove_proper_salary = False
         for key, value in self._s_jsonapi_attrs.items():
             if remove_proper_salary and key.startswith("_") and key.endswith("_"):
@@ -67,25 +66,27 @@ class SAFRSBaseX(SAFRSBase):
                 result[key] = value
         return result  # self._s_jsonapi_attrs for overridden behavior
 
+    """  explore adding checksum generically
     # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
     #@add_method(cls)
     @jsonapi_attr
-    def __check_sum__(self):  # type: ignore [no-redef]
+    def _check_sum_(self):  # type: ignore [no-redef]
         import database.models as models
         if isinstance(self, models.Employee):
-            return self.___check_sum___
+            return self.__check_sum__
         else:
             print("class")
             return None  # decimal.Decimal(10)
 
     #@add_method(cls)
-    @__check_sum__.setter
-    def check_sum__(self, value):  # type: ignore [no-redef]
-        self.__check_sum__ = value
-        print(f'___check_sum___={self.__check_sum__}')
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_ = value
+        print(f'__check_sum__={self._check_sum_}')
         pass
 
-    CheckSum = __check_sum__
+    CheckSum = _check_sum_
+    """
     
 
 
@@ -263,7 +264,7 @@ t_sqlite_sequence = Table(
 )
 
 
-class Employee(SAFRSBaseX, Base):  # , models_mix.Employee_mix):
+class Employee(SAFRSBase, Base):  # explore using SafrsBaseX
     """
     This fails as a mixin 
     
@@ -305,30 +306,30 @@ class Employee(SAFRSBaseX, Base):  # , models_mix.Employee_mix):
     EmployeeTerritoryList = relationship('EmployeeTerritory', cascade_backrefs=True, backref='Employee')
     OrderList = relationship('Order', cascade_backrefs=True, backref='Employee')
 
-    """  # enable this code to make expose virtual attribute
+    # enable this code to expose check_sum as virtual attribute
     from safrs import jsonapi_attr
     # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
     @jsonapi_attr
-    def proper_salary(self):  # type: ignore [no-redef]
-        import database.models as models
-        if isinstance(self, models.Employee):
-            import decimal
-            rtn_value = self.Salary
-            rtn_value = decimal.Decimal('1.25') * rtn_value
-            self._proper_salary = int(rtn_value)
-            return self._proper_salary
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, Employee):
+            try:
+              return self._check_sum_property
+            except:
+              print(f'{__name__}: no _check_sum_property in {self}')
+              return -1
         else:
             print("class")
-            return db.Decimal(10)
+            return None  # decimal.Decimal(10)
 
-    @proper_salary.setter
-    def proper_salary(self, value):  # type: ignore [no-redef]
-        self._proper_salary = value
-        print(f'_proper_salary={self._proper_salary}')
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+        # setattr(self, "__check_sum", value)
+        # print(f'_check_sum_property={self._check_sum_property}')
         pass
 
-    ProperSalary = proper_salary  # signal safrs to recognize this as api-visible property
-    """
+    CheckSum = _check_sum_
+    
     
 
 class EmployeeAudit(SAFRSBase, Base):

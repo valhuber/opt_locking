@@ -18,10 +18,14 @@ def sys_logic_setup(session):
     def receive_loaded_as_persistent(session, instance):
         "listen for the 'loaded_as_persistent' event"
 
-        logger.debug(f'{__name__} - hello there instance: {instance}')
         if isinstance(instance, models.Department):
             logger.debug(f'{__name__} - hello there DEPT instance: {instance}')
         elif isinstance(instance, models.Employee):
-            logger.debug(f'{__name__} - hello there EMP instance: {instance}')
+            logger.debug(f'{__name__} - setting CheckSum in EMP instance: {instance}')
+            setattr(instance, "_chx_sum_property", 155)
+            setattr(instance, "_check_sum_property", 55)
+            # instance.CheckSum = 55  # later, figure out algorithm for this
         else:
-            logger.debug(f'{__name__} - hello there instance: {instance}')
+            # todo discuss why SO many calls
+            # logger.debug(f'{__name__} - hello there instance: {instance}')
+            pass
