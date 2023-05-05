@@ -59,9 +59,10 @@ Though, `_check_sum_property` appears as an attr in json response.
 > This can be resolved by overriding `SAFRSBase`, as illustrated in `database/models.py`.
 
 Additional choices remain - *where* to define:
-1. In `database/customize_models.py`
-2. In `database/models.py` -- in super class `SafrsBaseX`
-3. In `database/models.py` -- inline, in `Employees`
+
+1. In `database/models.py` -- inline, in `Employees` **<=== seems to work??**
+2. In `database/models.py` -- in super class `SafrsBaseX` (test requires changes)
+3. In `database/customize_models.py`
 
 &nbsp;
 
@@ -69,7 +70,7 @@ Additional choices remain - *where* to define:
 
 This is ***failing***, since jsonapi_attr values are not sent on `Patch`.  We can test both `__check_sum__` and `Proper_Salary`, as follows:
 
-1. Set breakpoint @194 in `logic/declare_logic.py`
+1. Set breakpoint @205 in `logic/declare_logic.py`
 2. Use Run Config `ApiLogicServer - No Security`
 3. In Swagger, **Employee/Patch** the following for **id 5**:
 
@@ -111,7 +112,7 @@ curl -X 'PATCH' \
 ```
 
 ```log
-logic sees:chk_CheckSum=57, chk_ChxSum=155, chk_CheckSumProperty=57, chk_ChxSumProperty=155 
+logic sees: chk_ChxSumProperty=155 chk_CheckSumProperty=57, chk_ChxSum=155, chk_CheckSum=57
 ```
 &nbsp;
 

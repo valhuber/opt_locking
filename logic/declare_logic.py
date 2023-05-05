@@ -197,10 +197,10 @@ def declare_logic():
             chk_CheckSumProperty = row._check_sum_property
             chk_ChxSumProperty = row._chx_sum_property
             print(f'logic sees:'
-                  f'chk_CheckSum={chk_CheckSum}, '
-                  f'chk_ChxSum={chk_ChxSum}, '
+                  f'chk_ChxSumProperty={chk_ChxSumProperty}, '
                   f'chk_CheckSumProperty={chk_CheckSumProperty}, '
-                  f'chk_ChxSumProperty={chk_ChxSumProperty} '
+                  f'chk_ChxSum={chk_ChxSum}, '
+                  f'chk_CheckSum={chk_CheckSum} '
                   '')
             return row.Salary >= Decimal('1.20') * old_row.Salary
         else:
