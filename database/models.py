@@ -66,27 +66,26 @@ class SAFRSBaseX(SAFRSBase):
                 result[key] = value
         return result  # self._s_jsonapi_attrs for overridden behavior
 
-    """  explore adding checksum generically
+    #   explore adding checksum generically
     # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
     #@add_method(cls)
     @jsonapi_attr
-    def _check_sum_(self):  # type: ignore [no-redef]
-        import database.models as models
-        if isinstance(self, models.Employee):
-            return self.__check_sum__
+    def _check_mix_(self):  # type: ignore [no-redef]
+        if hasattr(self, "_check_mix_property"):
+            return self._check_mix_property
         else:
-            print("class")
+            # print("class")
             return None  # decimal.Decimal(10)
 
     #@add_method(cls)
-    @_check_sum_.setter
-    def _check_sum_(self, value):  # type: ignore [no-redef]
-        self._check_sum_ = value
-        print(f'__check_sum__={self._check_sum_}')
+    @_check_mix_.setter
+    def _check_mix_(self, value):  # type: ignore [no-redef]
+        self._check_mix_property = value
+        print(f'_check_mix_property = {self._check_mix_property}')
         pass
 
-    CheckSum = _check_sum_
-    """
+    CheckMix = _check_mix_
+    
     
 
 
@@ -264,7 +263,7 @@ t_sqlite_sequence = Table(
 )
 
 
-class Employee(SAFRSBase, Base):  # explore using SafrsBaseX
+class Employee(SAFRSBaseX, Base):  # explore using SafrsBaseX
     """
     This fails as a mixin 
     

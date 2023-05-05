@@ -24,6 +24,7 @@ def sys_logic_setup(session):
             logger.debug(f'{__name__} - setting CheckSum in EMP instance: {instance}')
             setattr(instance, "_chx_sum_property", 155)
             setattr(instance, "_check_sum_property", 55)
+            setattr(instance, "_check_mix_property", 25)
             # instance.CheckSum = 55  # later, figure out algorithm for this
         else:
             # todo discuss why SO many calls

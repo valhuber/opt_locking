@@ -60,9 +60,12 @@ Though, `_check_sum_property` appears as an attr in json response.
 
 Additional choices remain - *where* to define:
 
-1. In `database/models.py` -- **inline**, in `Employees` **<=== seems to work??**
-2. In `database/models.py` -- in super class `SafrsBaseX` (test requires changes, not done)
+1. In `database/models.py` -- **inline**, in `Employees`
+    * **seems to work??**
+2. In `database/models.py` -- in super class `SafrsBaseX`
+    * not working
 3. In `database/customize_models.py`
+    * not working
 
 ## 3. Clients include read-checksum in `Patch`
 
@@ -79,10 +82,12 @@ curl -X 'PATCH' \
     "data": {
         "attributes": {
             "Salary": 200000,
-            "_chx_sum_property": 156,
-            "_check_sum_property": 56,
+            "_chx_sum_property": 157,
+            "_check_sum_property": 57,
+            "_check_mix_property": 27,
             "ChkSum": 157,
             "CheckSum": 57,
+            "CheckMix": 27,
             "Proper_Salary": 50000,
             "Id": 5},
         "type": "Employee",
@@ -98,10 +103,12 @@ Or, swagger payload:
     "data": {
         "attributes": {
             "Salary": 200000,
-            "_chx_sum_property": 156,
-            "_check_sum_property": 56,
+            "_chx_sum_property": 157,
+            "_check_sum_property": 57,
+            "_check_mix_property": 27,
             "ChkSum": 157,
             "CheckSum": 57,
+            "CheckMix": 27,
             "Proper_Salary": 50000,
             "Id": 5},
         "type": "Employee",
@@ -116,7 +123,7 @@ Or, swagger payload:
 
 We can test the various strategies, as follows:
 
-1. Set breakpoint @205 in `logic/declare_logic.py`
+1. Set breakpoint as shown in `logic/declare_logic.py`
 2. Use Run Config `ApiLogicServer - No Security`
 3. Simulate the client using the cURL above
 4. Observe the logged values - the **inline** approach appears to work

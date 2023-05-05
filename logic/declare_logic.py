@@ -192,15 +192,23 @@ def declare_logic():
     def raise_over_20_percent(row: models.Employee, old_row: models.Employee, logic_row: LogicRow):
         if logic_row.ins_upd_dlt == "upd" and row.Salary > old_row.Salary:
             chk_ProperSalary = row.ProperSalary
-            chk_CheckSum = row.CheckSum
-            chk_ChxSum = row.ChxSum
+            chk_CheckSum = row.CheckSum     # inline
+            chk_ChxSum = row.ChxSum  #      # customize_models
+            chk_CheckMix = "not avail"  #   # mixin (SafrsBaseX)
+            if hasattr(row, "CheckMix"):
+                chk_CheckMix = row.CheckMix
             chk_CheckSumProperty = row._check_sum_property
             chk_ChxSumProperty = row._chx_sum_property
+            chk_CheckMixProperty = "not avail"
+            if hasattr(row, "_check_mix_property"):
+                chk_CheckMixProperty = row._check_mix_property
             print(f'logic sees:'
                   f'chk_ChxSumProperty={chk_ChxSumProperty}, '
                   f'chk_CheckSumProperty={chk_CheckSumProperty}, '
+                  f'chk_CheckMixProperty={chk_CheckMixProperty}, '
                   f'chk_ChxSum={chk_ChxSum}, '
                   f'chk_CheckSum={chk_CheckSum} '
+                  f'chk_CheckMix={chk_CheckMix} '
                   '')
             return row.Salary >= Decimal('1.20') * old_row.Salary
         else:
