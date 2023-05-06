@@ -49,6 +49,9 @@ from safrs import jsonapi_attr
 from abc import ABC
 class SAFRSBaseX(SAFRSBase):
     """ injects to_dict() to remove _proper_salary_, and compute CheckSum """
+
+    # __abstract__ = True  # utter magic!!
+
     # @override
     def to_dict(self, *args, **kwargs):
         """
