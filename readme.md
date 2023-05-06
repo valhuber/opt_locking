@@ -69,6 +69,8 @@ Additional choices remain - *where* to define:
 
 ## 3. Clients include read-checksum in `Patch`
 
+**Important:** Admin App is not sending unchanged attributes; we must convince it to send the CheckSum.
+
 To simulate the client:
 1. Set the breakpoint noted below, and 
 2. Use cURL (easiest) or swagger:
