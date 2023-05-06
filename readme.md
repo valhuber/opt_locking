@@ -8,7 +8,7 @@ We want **virtual attributes** that can be computed on retrieval, not stored in 
 
 1. SQLAlchemy provides the `loaded_as_persistent` event, enabling us to compute the `check_sum`, store it in the row, and check it on update.
 
-    * Storing it in the row is critical because we do not want to maintain server state between client calls.  Nor do we want to force customers to include special fields in their schema.
+    * Storing it in the row is critical because we do not want to maintain server state between client calls.  Nor do we want to force customers to include special fields in their schema.<br><br>
 
 2. For virtual attributes, we can use `@jsonapi_attr`.
 
