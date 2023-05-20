@@ -6,6 +6,9 @@ from logic_bank.logic_bank import Rule
 from database import models
 import logging
 
+from sqlalchemy import inspect
+
+from safrs import SAFRSBase
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +30,8 @@ def sys_logic_setup(session):
             setattr(instance, "_check_mix_property", 25)
             # instance.CheckSum = 55  # later, figure out algorithm for this
             from api import checksum as checksum
-            checksum_value = checksum.checksum([1,2])
+            checksum_value = checksum.checksum_row(instance)
+            print(f'checksum_value: {checksum_value}')
         elif isinstance(instance, models.Category):
             if getattr(instance, "Id") == 8:
                 logger.debug(f'{__name__} - setting Description in Category instance: {instance}')

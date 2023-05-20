@@ -1,8 +1,13 @@
 import decimal
 
+import sqlalchemy
+from sqlalchemy import inspect
+
+from safrs import SAFRSBase
+
 
 def checksum(list_arg: list) -> int:
-    
+
     real_tuple = []
     skip_none = True  # work-around for non-repeatable hash(None)
     if skip_none:     # https://bugs.python.org/issue19224
@@ -16,6 +21,21 @@ def checksum(list_arg: list) -> int:
     print(f'checksum({list_arg}) = {result}')
     return result
 
+
+def checksum_row(row: object) -> int:
+    inspector = inspect(row)
+    mapper = inspector.mapper
+    iterate_properties = mapper.iterate_properties
+    attr_list = []
+    for each_property in iterate_properties:
+        print(f'each_property: {each_property} <{type(each_property)}>')
+        if isinstance(each_property, sqlalchemy.orm.properties.ColumnProperty):
+            attr_list.append(getattr(row, each_property.class_attribute.key))
+    return_value = checksum(attr_list)
+    inspector_class = inspector.mapper.class_ 
+    print(f'inspector: {inspector}')
+    return return_value
+    pass
 
 def checksum_lists(list_arg: list):
     real_tuple = list_arg
