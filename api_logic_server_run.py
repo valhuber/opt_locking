@@ -353,7 +353,7 @@ def create_app(swagger_host: str = "localhost", swagger_port: str = "5656"):
                 app_logger.info("..declare security - security/declare_security.py"
                     + f' -- {len(database.authentication_models.metadata.tables)} authentication tables loaded')
 
-            from logic import sys_logic
+            from api import sys_logic
             sys_logic.sys_logic_setup(session)
             SAFRSBase._s_auto_commit = False
             

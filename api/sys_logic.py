@@ -26,6 +26,8 @@ def sys_logic_setup(session):
             setattr(instance, "_check_sum_property", 55)
             setattr(instance, "_check_mix_property", 25)
             # instance.CheckSum = 55  # later, figure out algorithm for this
+            from api import checksum as checksum
+            checksum_value = checksum.checksum([1,2])
         elif isinstance(instance, models.Category):
             if getattr(instance, "Id") == 8:
                 logger.debug(f'{__name__} - setting Description in Category instance: {instance}')

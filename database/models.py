@@ -321,7 +321,7 @@ class Employee(SAFRSBaseX, Base):  # explore using SafrsBaseX (brings in _check_
               return -1
         else:
             print("class")
-            return None  # decimal.Decimal(10)
+            return None
 
     @_check_sum_.setter
     def _check_sum_(self, value):  # type: ignore [no-redef]
