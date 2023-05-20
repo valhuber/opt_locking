@@ -71,7 +71,7 @@ class SAFRSBaseX(SAFRSBase):
 
     #   explore adding checksum generically
     # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
-    @add_method(cls)
+    # @add_method(cls)
     @jsonapi_attr
     def _check_mix_(self):  # type: ignore [no-redef]
         if hasattr(self, "_check_mix_property"):
@@ -80,7 +80,7 @@ class SAFRSBaseX(SAFRSBase):
             # print("class")
             return None  # decimal.Decimal(10)
 
-    @add_method(cls)
+    # @add_method(cls)
     @_check_mix_.setter
     def _check_mix_(self, value):  # type: ignore [no-redef]
         self._check_mix_property = value

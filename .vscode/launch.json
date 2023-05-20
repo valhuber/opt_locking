@@ -46,6 +46,17 @@
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
+            "name": "Checksum test",
+            "type": "python",
+            "request": "launch",
+            "program": "checksum.py",
+            "env": {"PYTHONHASHSEED": "0"},
+            "redirectOutput": true,
+            "justMyCode": false,
+            "console": "internalConsole",
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
             "name": "Behave Run",
             "type": "python",
             "request": "launch",
