@@ -432,8 +432,8 @@ class Order(SAFRSBase, Base):
     ShipAddress = Column(String(8000))
     ShipCity = Column(String(8000))
     ShipRegion = Column(String(8000))
-    ShipPostalCode = Column(String(8000))
-    ShipCountry = Column(String(8000))
+    ShipZip = Column('ShipPostalCode', String(8000))  # manual fix - alias
+     ShipCountry = Column(String(8000))
     AmountTotal = Column(DECIMAL(10, 2))
     Country = Column(String(50))
     City = Column(String(50))
