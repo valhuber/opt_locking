@@ -43,6 +43,10 @@ def sys_logic_setup(session):
             if getattr(instance, "Id") == 8:
                 logger.debug(f'{__name__} - setting Description in Category instance: {instance}')
                 setattr(instance, "Description", None)
+        elif isinstance(instance, models.Order):
+            checksum_value = checksum.checksum_row(instance)
+            setattr(instance, "_check_sum_property", checksum_value)
+            print(f'checksum_value: {checksum_value}')
         else:
             # todo discuss why SO many calls
             # logger.debug(f'{__name__} - hello there instance: {instance}')
