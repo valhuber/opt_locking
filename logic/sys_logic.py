@@ -26,6 +26,10 @@ def sys_logic_setup(session):
             setattr(instance, "_check_sum_property", 55)
             setattr(instance, "_check_mix_property", 25)
             # instance.CheckSum = 55  # later, figure out algorithm for this
+        elif isinstance(instance, models.Category):
+            if getattr(instance, "Id") == 8:
+                logger.debug(f'{__name__} - setting Description in Category instance: {instance}')
+                setattr(instance, "Description", None)
         else:
             # todo discuss why SO many calls
             # logger.debug(f'{__name__} - hello there instance: {instance}')

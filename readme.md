@@ -163,8 +163,12 @@ Other approach is to generate models like this:
 class Employee(SAFRSBase, Base, models_mix.Employee_mix):
 ```
 
-where `database/models_mix.Employee_mix` is a user-alterable (not rebuilt) file that defines virtual attributes.  
+where `database/models_mix.Employee_mix` is a user-alterable (not rebuilt) file that defines virtual attributes (`_check_mix_`).  
 
-However, this ***does not appear to work*** for `@jsonapi_attr` -- it is not called when retrieving rows, and `ProperSalary` does not appear in swagger.  Likely user error.
+However, this ***does not appear to work*** for `@jsonapi_attr` -- it is not called when retrieving rows, and `ProperSalary` does not appear in swagger.  
+
+Also, a flawed in that the dynamic `@add_method(cls)` is not generic... what `cls` should be passed to add_method?
+
+Unclear how to resolve.
 
 **Explored in this hand-altered prototype.**
