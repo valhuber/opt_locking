@@ -102,6 +102,30 @@ class Category(SAFRSBaseX, Base):
     Description = Column(String(8000))
     Client_id = Column(Integer)
 
+    # enable this code to expose check_sum as virtual attribute
+    from safrs import jsonapi_attr
+    # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, Category):
+            try:
+              return self._check_sum_property
+            except:
+              print(f'{__name__}: no _check_sum_property in {self}')
+              return -1
+        else:
+            print("class")
+            return None
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+        # setattr(self, "__check_sum", value)
+        # print(f'_check_sum_property={self._check_sum_property}')
+        pass
+
+    CheckSum = _check_sum_
+
 
 class Customer(SAFRSBase, Base):
     __tablename__ = 'Customer'
@@ -153,6 +177,30 @@ class Department(SAFRSBase, Base):
     Department = relationship('Department', remote_side=[Id], cascade_backrefs=True, backref='DepartmentList')  # special handling for self-relationships
     EmployeeList = relationship('Employee', primaryjoin='Employee.OnLoanDepartmentId == Department.Id', cascade_backrefs=True, backref='Department')
     EmployeeList1 = relationship('Employee', primaryjoin='Employee.WorksForDepartmentId == Department.Id', cascade_backrefs=True, backref='Department1')
+
+    # enable this code to expose check_sum as virtual attribute
+    from safrs import jsonapi_attr
+    # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
+    @jsonapi_attr
+    def _check_sum_(self):  # type: ignore [no-redef]
+        if isinstance(self, Department):
+            try:
+              return self._check_sum_property
+            except:
+              print(f'{__name__}: no _check_sum_property in {self}')
+              return -1
+        else:
+            print("class")
+            return None
+
+    @_check_sum_.setter
+    def _check_sum_(self, value):  # type: ignore [no-redef]
+        self._check_sum_property = value
+        # setattr(self, "__check_sum", value)
+        # print(f'_check_sum_property={self._check_sum_property}')
+        pass
+
+    CheckSum = _check_sum_
 
 
 class Location(SAFRSBase, Base):

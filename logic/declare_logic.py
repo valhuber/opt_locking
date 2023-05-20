@@ -5,6 +5,8 @@ from logic_bank.extensions.rule_extensions import RuleExtension
 from logic_bank.logic_bank import Rule
 from database import models
 import logging
+from api import checksum as checksum
+
 
 preferred_approach = True
 """ Some examples below contrast a preferred approach with a more manual one """
@@ -156,6 +158,19 @@ def declare_logic():
     Rule.constraint(validate=models.Employee,
         as_condition=lambda row: row.LastName != 'x',
         error_msg="LastName cannot be 'x'")
+    
+    def valid_category_description(row: models.Category, old_row: models.Category, logic_row: LogicRow):
+        if logic_row.ins_upd_dlt == "upd":
+            chk_CheckSum = row.CheckSum     # inline
+            current_checksum = checksum.checksum_old_row(old_row)
+            assert 1 + chk_CheckSum == current_checksum, "optimistic lock failure"
+            return row.Description != 'x'
+        else:
+            return True
+    Rule.constraint(validate=models.Category,
+                    calling=valid_category_description,
+                    error_msg="{row.Description} cannot be 'x'")
+
 
 
     """
@@ -210,6 +225,8 @@ def declare_logic():
                   f'chk_CheckSum={chk_CheckSum} '
                   f'chk_CheckMix={chk_CheckMix} '
                   '')
+            current_checksum = checksum.checksum_old_row(old_row)
+            assert 1 + chk_CheckSumProperty == current_checksum, "optimistic lock failure"
             return row.Salary >= Decimal('1.20') * old_row.Salary
         else:
             return True

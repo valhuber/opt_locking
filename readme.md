@@ -85,7 +85,7 @@ curl -X 'PATCH' \
         "attributes": {
             "Salary": 200000,
             "_chx_sum_property": 157,
-            "_check_sum_property": 57,
+            "_check_sum_property": 6785985870086950264,
             "_check_mix_property": 27,
             "ChkSum": 157,
             "CheckSum": 57,
@@ -109,7 +109,7 @@ Or, swagger payload:
             "_check_sum_property": 57,
             "_check_mix_property": 27,
             "ChkSum": 157,
-            "CheckSum": 57,
+            "CheckSum": 6785985870086950000,
             "CheckMix": 27,
             "Proper_Salary": 50000,
             "Id": 5},
@@ -119,7 +119,41 @@ Or, swagger payload:
 }
 ```
 
+Get (6785985870086950264):
+
+```
+curl -X 'GET' \
+  'http://localhost:5656/api/Employee/5/?fields%5BEmployee%5D=Id%2CLastName%2CFirstName%2CTitle%2CTitleOfCourtesy%2CBirthDate%2CHireDate%2CAddress%2CCity%2CRegion%2CPostalCode%2CCountry%2CHomePhone%2CExtension%2CNotes%2CReportsTo%2CPhotoPath%2CEmployeeType%2CSalary%2CWorksForDepartmentId%2COnLoanDepartmentId%2CUnionId%2CDues%2C_check_sum_%2CCheckSum%2C__proper_salary__%2CProperSalary%2C_chx_sum_%2CChxSum' \
+  -H 'accept: application/vnd.api+json' \
+  -H 'Content-Type: application/vnd.api+json'
+```
 &nbsp;
+
+Also verify works with alias Entity / Attr names, using Category (-4130312969102546939)
+
+```
+curl -X 'GET' \
+  'http://localhost:5656/api/Category/1/?fields%5BCategory%5D=Id%2CCategoryName%2CDescription%2CClient_id%2C_check_sum_%2CCheckSum' \
+  -H 'accept: application/vnd.api+json' \
+  -H 'Content-Type: application/vnd.api+json'
+```
+
+```
+curl -X 'PATCH' \
+  'http://localhost:5656/api/Category/1/' \
+  -H 'accept: application/vnd.api+json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "data": {
+    "attributes": {
+      "Description": "x",
+      "CheckSum": "-4130312969102546939"
+    },
+    "type": "Category",
+    "id": "1"
+  }
+}'
+```
 
 ## 4. Check `_check_sum_` in logic
 
