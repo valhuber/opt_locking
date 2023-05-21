@@ -30,7 +30,6 @@ metadata = Base.metadata
 from sqlalchemy.dialects.sqlite import *
 ########################################################################################################################
 
-import database.models_mix as models_mix
 
 def add_method(cls):
   """
@@ -67,6 +66,7 @@ class SAFRSBaseX(SAFRSBase):
                 pass  # eg, remove __proper_salary__, not called on update
             else:
                 result[key] = value
+        result["ToDict_Checksum"] = 42  # we can send it out like this, but not marshalled back on update
         return result  # self._s_jsonapi_attrs for overridden behavior
 
     #   explore adding checksum generically
@@ -126,7 +126,7 @@ class Category(SAFRSBaseX, Base):
     CheckSum = _check_sum_
 
 
-class Customer(SAFRSBase, Base):
+class Customer(SAFRSBaseX, Base):
     __tablename__ = 'Customer'
     _s_collection_name = 'Customer'  # type: ignore
     __bind_key__ = 'None'
@@ -311,8 +311,9 @@ t_sqlite_sequence = Table(
     Column('seq', NullType)
 )
 
+import database.models_mix as models_mix
 
-class Employee(SAFRSBaseX, Base):  # explore using SafrsBaseX (brings in _check_mix_)
+class Employee(SAFRSBaseX, Base, models_mix.Opt_mix):  # explore using SafrsBaseX (brings in _check_mix_)
     """
     This fails as a mixin 
     

@@ -83,12 +83,12 @@ curl -X 'PATCH' \
   -d '{
     "data": {
         "attributes": {
-            "Salary": 200000,
+            "Salary": 97000,
             "_chx_sum_property": 157,
             "_check_sum_property": 6785985870086950264,
             "_check_mix_property": 27,
             "ChkSum": 157,
-            "CheckSum": 57,
+            "CheckSum": 6785985870086950264,
             "CheckMix": 27,
             "Proper_Salary": 50000,
             "Id": 5},
@@ -97,6 +97,9 @@ curl -X 'PATCH' \
     }
 }'
 ```
+
+Not visible on update: ChkSum, CheckMix
+Visible: CheckSum
 
 Or, swagger payload:
 
@@ -129,6 +132,35 @@ curl -X 'GET' \
 ```
 &nbsp;
 
+
+Test unmodelled attr -- ToDict_Checksum is not marshalled into row on update
+
+```
+curl -X 'PATCH' \
+  'http://localhost:5656/api/Employee/5/' \
+  -H 'accept: application/vnd.api+json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "data": {
+        "attributes": {
+            "Salary": 200000,
+            "_chx_sum_property": 157,
+            "_check_sum_property": 6785985870086950264,
+            "_check_mix_property": 27,
+            "ToDict_Checksum": 42,
+            "ChkSum": 157,
+            "CheckSum": 57,
+            "CheckMix": 27,
+            "Proper_Salary": 50000,
+            "Id": 5},
+        "type": "Employee",
+        "id": 5
+    }
+}'
+```
+
+&nbsp;
+
 Also verify works with alias Entity / Attr names, using Category (-4130312969102546939)
 
 ```
@@ -154,6 +186,7 @@ curl -X 'PATCH' \
   }
 }'
 ```
+
 
 ## 4. Check `_check_sum_` in logic
 
@@ -206,3 +239,11 @@ Also, a flawed in that the dynamic `@add_method(cls)` is not generic... what `cl
 Unclear how to resolve.
 
 **Explored in this hand-altered prototype.**
+
+&nbsp;
+
+### Option 3: declare in super type
+
+Got error: `metaclass conflict: the metaclass of a derived class must be a (non-strict) subclass of the metaclasses of all its bases`
+
+

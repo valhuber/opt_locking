@@ -83,12 +83,14 @@ t_sqlite_sequence = Table(
 )
 
 
-class Employee_mix():
+class Opt_mix():
     """
-    Add virtual attributes here, to preserve over rebuild-from-model.
+    Add Opt Locking virtual attributes here, to preserve over rebuild-from-model.
 
-    Not working, though adding abstract might help... to be explored.
+    Not working... adding abstract did not help...
     """
+
+    __abstract__ = True  # utter magic!!
 
     # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
     @jsonapi_attr

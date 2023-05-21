@@ -226,7 +226,7 @@ def declare_logic():
                   f'chk_CheckMix={chk_CheckMix} '
                   '')
             current_checksum = checksum.checksum_old_row(old_row)
-            assert 1 + chk_CheckSumProperty == current_checksum, "optimistic lock failure"
+            assert chk_CheckSumProperty == current_checksum, "optimistic lock failure"
             return row.Salary >= Decimal('1.20') * old_row.Salary
         else:
             return True
