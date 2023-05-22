@@ -20,7 +20,7 @@ def sys_logic_setup(session):
 
     @event.listens_for(session, 'loaded_as_persistent')
     def receive_loaded_as_persistent(session, instance):
-        "listen for the 'loaded_as_persistent' event - set CheckSum"
+        "listen for the 'loaded_as_persistent' (get) event - set CheckSum"
 
         if isinstance(instance, models.Department):
             logger.debug(f'{__name__} - hello there DEPT instance: {instance}')
@@ -32,9 +32,8 @@ def sys_logic_setup(session):
             setattr(instance, "_chx_sum_property", 155)
             setattr(instance, "_check_sum_property", 55)
             setattr(instance, "_check_mix_property", 25)
-            # instance.CheckSum = 55  # later, figure out algorithm for this
             checksum_value = checksum.checksum_row(instance)
-            print(f'checksum_value: {checksum_value}')
+            print(f'setting CheckSum value (via setter): {checksum_value}')
             setattr(instance, "_check_sum_property", checksum_value)
         elif isinstance(instance, models.Category):
             checksum_value = checksum.checksum_row(instance)

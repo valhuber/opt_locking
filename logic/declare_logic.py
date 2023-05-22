@@ -217,16 +217,14 @@ def declare_logic():
             chk_CheckMixProperty = "not avail"
             if hasattr(row, "_check_mix_property"):
                 chk_CheckMixProperty = row._check_mix_property
-            print(f'logic sees:'
-                  f'chk_ChxSumProperty={chk_ChxSumProperty}, '
-                  f'chk_CheckSumProperty={chk_CheckSumProperty}, '
-                  f'chk_CheckMixProperty={chk_CheckMixProperty}, '
-                  f'chk_ChxSum={chk_ChxSum}, '
-                  f'chk_CheckSum={chk_CheckSum} '
-                  f'chk_CheckMix={chk_CheckMix} '
-                  '')
             current_checksum = checksum.checksum_old_row(old_row)
-            assert chk_CheckSumProperty == current_checksum, "optimistic lock failure"
+            print(f'logic sees Patched row: '
+                  f'chk_ChxSum (customize models) = {chk_ChxSum}, '
+                  f'chk_CheckSum (inline) = {chk_CheckSum} '
+                  f'chk_CheckMix (Mixin) = {chk_CheckMix} '
+                  '')
+            assert chk_CheckSumProperty == current_checksum,\
+                f"optimistic lock failure - as-read vs current: {chk_CheckSumProperty} vs {current_checksum}"
             return row.Salary >= Decimal('1.20') * old_row.Salary
         else:
             return True

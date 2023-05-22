@@ -18,7 +18,7 @@ def checksum(list_arg: list) -> int:
             else:
                 real_tuple.append(each_entry)
     result = hash(tuple(real_tuple))
-    print(f'checksum({list_arg}) = {result}')
+    print(f'checksum[{result}] from row: {list_arg})')
     return result
 
 
@@ -28,12 +28,12 @@ def checksum_row(row: object) -> int:
     iterate_properties = mapper.iterate_properties
     attr_list = []
     for each_property in iterate_properties:
-        print(f'each_property: {each_property} <{type(each_property)}>')
+        print(f'row.property: {each_property} <{type(each_property)}>')
         if isinstance(each_property, sqlalchemy.orm.properties.ColumnProperty):
             attr_list.append(getattr(row, each_property.class_attribute.key))
     return_value = checksum(attr_list)
     inspector_class = inspector.mapper.class_ 
-    print(f'checksum_row (get) return_value {return_value}, inspector: {inspector}')
+    print(f'checksum_row (get) [{return_value}], inspector: {inspector}')
     return return_value  # eg. 6785985870086950264
     pass
 
@@ -41,11 +41,11 @@ def checksum_row(row: object) -> int:
 def checksum_old_row(logic_row_old: object) -> int:
     attr_list = []
     for each_property in logic_row_old.keys():
-        print(f'each_property: {each_property} <{type(each_property)}>')
+        print(f'old_row.property: {each_property} <{type(each_property)}>')
         if True:  # isinstance(each_property, sqlalchemy.orm.properties.ColumnProperty):
             attr_list.append(getattr(logic_row_old, each_property))
     return_value = checksum(attr_list)
-    print(f'checksum_old_row return_value {return_value} -- seeing -4130312969102546939 (vs. get: -4130312969102546939-4130312969102546939)')
+    print(f'checksum_old_row [{return_value}] -- seeing -4130312969102546939 (vs. get: -4130312969102546939-4130312969102546939)')
     return return_value  # eg. -4130312969102546939 (get: -4130312969102546939)
     pass
 

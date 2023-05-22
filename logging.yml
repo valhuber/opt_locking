@@ -41,7 +41,7 @@ loggers:
         handlers: [console]
         propagate: no
 
-    logic.sys_logic:
+    api.sys_logic:
         level: DEBUG
         handlers: [console]
         propagate: no

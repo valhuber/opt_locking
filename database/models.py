@@ -373,7 +373,7 @@ class Employee(SAFRSBaseX, Base, models_mix.Opt_mix):  # explore using SafrsBase
     def _check_sum_(self, value):  # type: ignore [no-redef]
         self._check_sum_property = value
         # setattr(self, "__check_sum", value)
-        # print(f'_check_sum_property={self._check_sum_property}')
+        print(f'_check_sum_property={self._check_sum_property}')
         pass
 
     CheckSum = _check_sum_
