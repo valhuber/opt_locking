@@ -2,19 +2,19 @@ Optimistic locking is a valuable feature.  It is a blocker for companies who mig
 
 &nbsp;
 
-## TL;DR - Compute virtual attribute `_check_sum_` in `loaded_as_persistent`, verify on save
+## TL;DR - Compute virtual attribute `CheckSum` in `loaded_as_persistent`, verify on save
 
-We want **virtual attributes** that can be computed on retrieval, not stored in the database, and attached to API rows as they are sent / returned from the client.  The returned `_check_sum_` can then be tested (in logic) to make sure it was unchanged.
+We want **virtual attributes** that can be computed on retrieval, not stored in the database, and attached to API rows as they are sent / returned from the client.  The returned `CheckSum` can then be tested (in logic) to make sure it was unchanged.
 
-1. SQLAlchemy provides the `loaded_as_persistent` event, enabling us to compute the `check_sum`, store it in the row, and check it on update.
+1. SQLAlchemy provides the `loaded_as_persistent` event, enabling us to compute the `CheckSum`, store it in the row, and check it on update.
 
     * Storing it in the row is critical because we do not want to maintain server state between client calls.  Nor do we want to force customers to include special fields in their schema.<br><br>
 
 2. For virtual attributes, we can use `@jsonapi_attr`.
 
-3. Clients must include the read-checksum (virtual attribute) in the `Patch`
+3. Clients must include the as-read-checksum (virtual attribute) in the `Patch`
 
-4. Logic will verify that the read-checksum equals the current-checksum
+4. Logic will verify that the as-read-checksum equals the current-checksum
 
 &nbsp;
 
@@ -25,9 +25,9 @@ We want **virtual attributes** that can be computed on retrieval, not stored in 
 ```python
         elif isinstance(instance, models.Employee):
             logger.debug(f'{__name__} - setting CheckSum in EMP instance: {instance}')
-            setattr(instance, "_chx_sum_property", 155)
-            setattr(instance, "_check_sum_property", 55)
-            # instance.CheckSum = 55  # later, figure out algorithm for this
+            checksum_value = checksum.checksum_row(instance)
+            print(f'checksum_value: {checksum_value}')
+            setattr(instance, "_check_sum_property", checksum_value)
 ```
 
 We set up the listener in `api_logic_server_run.py`.
@@ -40,32 +40,22 @@ This might also work...?
 
 &nbsp;
 
-## 2. safrs `@jsonapi_attr` (works - where to define?)
+## 2. safrs `@jsonapi_attr` for `CheckSum` virtual attribute
 
 This provides a mechanism to define attributes as part of the row (so it sent to / returned from the client), and not saved to disk.  
 
 The question is: ***where can this declaration be made.***  Options are discussed below.
 
-&nbsp;
-
-### Chosen Option: Add Dynamic Method
-
-See `add_method.py`, courtesy: https://mgarod.medium.com/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
-
-Appears to work, most preferable since requires no change to models.py (so can rebuild-from-database).
-
-Though, `_check_sum_property` appears as an attr in json response.  
-
-> This can be resolved by overriding `SAFRSBase`, as illustrated in `database/models.py`.
-
-Additional choices remain - *where* to define:
-
 1. In `database/models.py` -- **inline**, in `Employees`
-    * **seems to work??**
+    * **works**
 2. In `database/models.py` -- in super class `SafrsBaseX`
     * not working
 3. In `database/customize_models.py`
-    * not working
+    * not working - not marshalled on patch (same for ProperSalary)
+
+So, looks like the **inline** option is the only one that works.
+
+&nbsp;
 
 ## 3. Clients include read-checksum in `Patch`
 
@@ -84,12 +74,9 @@ curl -X 'PATCH' \
     "data": {
         "attributes": {
             "Salary": 97000,
-            "_chx_sum_property": 157,
-            "_check_sum_property": 6785985870086950264,
-            "_check_mix_property": 27,
-            "ChkSum": 157,
+            "ChkSum": 6785985870086950265,
             "CheckSum": 6785985870086950264,
-            "CheckMix": 27,
+            "CheckMix": 6785985870086950266,
             "Proper_Salary": 50000,
             "Id": 5},
         "type": "Employee",
@@ -99,28 +86,10 @@ curl -X 'PATCH' \
 ```
 
 Not visible on update: ChkSum, CheckMix
+> Patch base @ 305, confirm: print(f'Safrs DEBUG - not in self.__class__._s_jsonapi_attrs: {attr_name}')
 Visible: CheckSum
+> Verified not seeing *checksum override* by using "CheckSum": "6785985870086950264-xx", -- properly raises "opt lock failure"
 
-Or, swagger payload:
-
-```json
-{
-    "data": {
-        "attributes": {
-            "Salary": 200000,
-            "_chx_sum_property": 157,
-            "_check_sum_property": 57,
-            "_check_mix_property": 27,
-            "ChkSum": 157,
-            "CheckSum": 6785985870086950000,
-            "CheckMix": 27,
-            "Proper_Salary": 50000,
-            "Id": 5},
-        "type": "Employee",
-        "id": 5
-    }
-}
-```
 
 Get (6785985870086950264):
 
@@ -161,7 +130,9 @@ curl -X 'PATCH' \
 
 &nbsp;
 
-Also verify works with alias Entity / Attr names, using Category (-4130312969102546939)
+#### Approach works with logical (not db) names
+
+Also verified works with alias Entity / Attr names, using Category (-4130312969102546939)
 
 ```
 curl -X 'GET' \
@@ -187,20 +158,20 @@ curl -X 'PATCH' \
 }'
 ```
 
+&nbsp;
 
-## 4. Check `_check_sum_` in logic
+## 4. Check `CheckSum` in logic
 
 We can test the various strategies, as follows:
 
 1. Set breakpoint as shown in `logic/declare_logic.py`
 2. Use Run Config `ApiLogicServer - No Security`
-3. Simulate the client using the cURL above
+3. Simulate the client using the first cURL above
 4. Observe the logged values - the **inline** approach appears to work
 
 ```log
-logic sees: chk_ChxSumProperty=155 chk_CheckSumProperty=57, chk_ChxSum=155, chk_CheckSum=57
+logic sees Patched row: chk_ChxSum (customize models) = 155, chk_CheckSum (inline) = 6785985870086950264 chk_CheckMix (Mixin) = 25 
 ```
-&nbsp;
 
 ![No Virtual Attrs](images/patch-virtuals.png)
 
@@ -238,7 +209,19 @@ Also, a flawed in that the dynamic `@add_method(cls)` is not generic... what `cl
 
 Unclear how to resolve.
 
-**Explored in this hand-altered prototype.**
+### Option 3: `@jsonapi_attr` in `customize_models.py`
+
+See `add_method.py`, courtesy: https://mgarod.medium.com/dynamically-add-a-method-to-a-class-in-python-c49204b85bd6
+
+Appears to work, attractive since requires no change to models.py (so can rebuild-from-database).
+
+Though, `_check_sum_property` appears as an attr in json response.  
+
+> This can be resolved by overriding `SAFRSBase`, as illustrated in `database/models.py`.
+
+This was rejected because while retrieval works, such attrs are merged into update rows:
+
+> Patch base @ 305, confirm: print(f'Safrs DEBUG - not in self.__class__._s_jsonapi_attrs: {attr_name}')
 
 &nbsp;
 
