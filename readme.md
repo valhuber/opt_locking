@@ -30,7 +30,7 @@ We want **virtual attributes** that can be computed on retrieval, not stored in 
             setattr(instance, "_check_sum_property", checksum_value)
 ```
 
-We set up the listener in `api_logic_server_run.py`.
+We set_up the listener (`opt_logic_setup`) in `api_logic_server_run.py`.
 
 &nbsp;
 

@@ -56,7 +56,7 @@ def checksum_old_row(logic_row_old: object) -> int:
     return return_value  # eg. -4130312969102546939 (get: -4130312969102546939)
 
 
-def sys_logic_setup(session):
+def opt_locking_setup(session):
     pass
 
     from sqlalchemy import event

@@ -354,7 +354,7 @@ def create_app(swagger_host: str = "localhost", swagger_port: str = "5656"):
                     + f' -- {len(database.authentication_models.metadata.tables)} authentication tables loaded')
 
             from api.system.opt_locking import opt_locking
-            opt_locking.sys_logic_setup(session)
+            opt_locking.opt_locking_setup(session)
             SAFRSBase._s_auto_commit = False
             
             session.close()
