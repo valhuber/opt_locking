@@ -20,7 +20,7 @@
             "name": "Checksum test",
             "type": "python",
             "request": "launch",
-            "program": "api/system/zchecksum.py",
+            "program": "api/system/opt_locking/zchecksum.py",
             "env": {"PYTHONHASHSEED": "0"},
             "redirectOutput": true,
             "justMyCode": false,

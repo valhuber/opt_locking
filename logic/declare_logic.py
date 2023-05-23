@@ -5,7 +5,7 @@ from logic_bank.extensions.rule_extensions import RuleExtension
 from logic_bank.logic_bank import Rule
 from database import models
 import logging
-from api.system import opt_locking as opt_locking
+from api.system.opt_locking import opt_locking as opt_locking
 
 
 preferred_approach = True
