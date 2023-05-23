@@ -41,7 +41,7 @@ loggers:
         handlers: [console]
         propagate: no
 
-    api.sys_logic:
+    api.system.opt_locking:
         level: DEBUG
         handlers: [console]
         propagate: no

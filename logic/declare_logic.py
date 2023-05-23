@@ -262,7 +262,9 @@ def declare_logic():
                                     which_children=which)
     Rule.row_event(on_class=models.Order, calling=clone_order)
 
+    import api.system.opt_locking.opt_locking as opt_locking
     def handle_all(logic_row: LogicRow):  # TIME / DATE STAMPING
+        opt_locking.opt_lock_patch(logic_row=logic_row)
         row = logic_row.row
         if logic_row.ins_upd_dlt == "ins" and hasattr(row, "CreatedOn"):
             row.CreatedOn = datetime.datetime.now()

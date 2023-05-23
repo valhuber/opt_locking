@@ -94,3 +94,10 @@ def opt_locking_setup(session):
             # todo discuss why SO many calls
             # logger.debug(f'{__name__} - hello there instance: {instance}')
             pass
+
+def opt_lock_patch(logic_row: LogicRow):
+    logger.debug(f'Opt Lock Patch')
+    as_read_checksum = logic_row.row.CheckSum
+    current_checksum = checksum_old_row(logic_row.old_row)
+    assert as_read_checksum == current_checksum,\
+        f"optimistic lock failure - as-read vs current: {as_read_checksum} vs {current_checksum}"
