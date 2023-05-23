@@ -85,6 +85,23 @@ curl -X 'PATCH' \
 }'
 ```
 
+Here is a patch for table with no CheckSum, to test optional OptLocking
+```
+curl -X 'PATCH' \
+  'http://localhost:5656/api/Customer/ALFKI/' \
+  -H 'accept: application/vnd.api+json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "data": {
+    "attributes": {
+      "CompanyName": "x"
+    },
+    "type": "Customer",
+    "id": "ALFKI"
+  }
+}'
+```
+
 Not visible on update: ChkSum, CheckMix
 > Patch base @ 305, confirm: print(f'Safrs DEBUG - not in self.__class__._s_jsonapi_attrs: {attr_name}')
 Visible: CheckSum
