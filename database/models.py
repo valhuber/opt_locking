@@ -312,6 +312,7 @@ t_sqlite_sequence = Table(
 )
 
 import database.models_mix as models_mix
+enable_emp_opt_logging = True
 
 class Employee(SAFRSBaseX, Base, models_mix.Opt_mix):  # explore using SafrsBaseX (brings in _check_mix_)
     """
@@ -355,28 +356,29 @@ class Employee(SAFRSBaseX, Base, models_mix.Opt_mix):  # explore using SafrsBase
     EmployeeTerritoryList = relationship('EmployeeTerritory', cascade_backrefs=True, backref='Employee')
     OrderList = relationship('Order', cascade_backrefs=True, backref='Employee')
 
-    # enable this code to expose check_sum as virtual attribute
-    # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
-    @jsonapi_attr
-    def _check_sum_(self):  # type: ignore [no-redef]
-        if isinstance(self, Employee):
-            try:
-              return self._check_sum_property
-            except:
-              print(f'{__name__}: no _check_sum_property in {self}')
-              return -1
-        else:
-            print("class")
-            return None
+    if enable_emp_opt_logging:
+        # enable this code to expose check_sum as virtual attribute
+        # add derived attribute: https://github.com/thomaxxl/safrs/blob/master/examples/demo_pythonanywhere_com.py
+        @jsonapi_attr
+        def _check_sum_(self):  # type: ignore [no-redef]
+            if isinstance(self, Employee):
+                try:
+                    return self._check_sum_property
+                except:
+                    print(f'{__name__}: no _check_sum_property in {self}')
+                    return -1
+            else:
+                print("class")
+                return None
 
-    @_check_sum_.setter
-    def _check_sum_(self, value):  # type: ignore [no-redef]
-        self._check_sum_property = value
-        # setattr(self, "__check_sum", value)
-        print(f'_check_sum_property={self._check_sum_property}')
-        pass
+        @_check_sum_.setter
+        def _check_sum_(self, value):  # type: ignore [no-redef]
+            self._check_sum_property = value
+            # setattr(self, "__check_sum", value)
+            print(f'_check_sum_property={self._check_sum_property}')
+            pass
 
-    CheckSum = _check_sum_
+        CheckSum = _check_sum_
     
     
 

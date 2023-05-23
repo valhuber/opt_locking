@@ -5,7 +5,7 @@ from logic_bank.extensions.rule_extensions import RuleExtension
 from logic_bank.logic_bank import Rule
 from database import models
 import logging
-from api import checksum as checksum
+from api.system import opt_locking as opt_locking
 
 
 preferred_approach = True
@@ -162,8 +162,8 @@ def declare_logic():
     def valid_category_description(row: models.Category, old_row: models.Category, logic_row: LogicRow):
         if logic_row.ins_upd_dlt == "upd":
             chk_CheckSum = row.CheckSum     # inline
-            current_checksum = checksum.checksum_old_row(old_row)
-            assert 1 + chk_CheckSum == current_checksum, "optimistic lock failure"
+            current_checksum = opt_locking.checksum_old_row(old_row)
+            assert chk_CheckSum == current_checksum, "optimistic lock failure"
             return row.Description != 'x'
         else:
             return True
@@ -217,7 +217,7 @@ def declare_logic():
             chk_CheckMixProperty = "not avail"
             if hasattr(row, "_check_mix_property"):
                 chk_CheckMixProperty = row._check_mix_property
-            current_checksum = checksum.checksum_old_row(old_row)
+            current_checksum = opt_locking.checksum_old_row(old_row)
             print(f'logic sees Patched row: '
                   f'chk_ChxSum (customize models) = {chk_ChxSum}, '
                   f'chk_CheckSum (inline) = {chk_CheckSum} '

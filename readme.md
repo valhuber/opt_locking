@@ -20,7 +20,7 @@ We want **virtual attributes** that can be computed on retrieval, not stored in 
 
 ## 1. Event `loaded_as_persistent` (works)
 
-[This event](https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.loaded_as_persistent) looks like this (see `logic/sys_logic.py`):
+[This event](https://docs.sqlalchemy.org/en/20/orm/events.html#sqlalchemy.orm.SessionEvents.loaded_as_persistent) looks like this (see `api/system/opt_locking.py`):
 
 ```python
         elif isinstance(instance, models.Employee):
@@ -63,7 +63,7 @@ So, looks like the **inline** option is the only one that works.
 
 To simulate the client:
 1. Set the breakpoint noted below, and 
-2. Use cURL (easiest) or swagger:
+2. Use cURL (easiest) or swagger (note: this should fail with constraint violation):
 
 ```curl
 curl -X 'PATCH' \
