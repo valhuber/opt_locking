@@ -65,6 +65,7 @@ def opt_locking_setup(session):
     def receive_loaded_as_persistent(session, instance):
         "listen for the 'loaded_as_persistent' (get) event - set CheckSum"
 
+        # would be unconditional when models *all* have CheckSum
         if isinstance(instance, models.Department):
             logger.debug(f'{__name__} - hello there DEPT instance: {instance}')
             checksum_value = checksum_row(instance)

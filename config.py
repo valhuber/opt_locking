@@ -1,6 +1,7 @@
 """Flask configuration variables."""
 from os import environ, path
 from pathlib import Path
+from enum import Enum
 import os
 import typing
 from dotenv import load_dotenv
@@ -24,6 +25,22 @@ app.config.setdefault('SQLALCHEMY_COMMIT_ON_TEARDOWN', False)
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, "default.env"))
 app_logger = logging.getLogger('api_logic_server_app')
+
+class ExtendedEnum(Enum):
+    """
+    enum that supports list() to print allowed values
+
+    Thanks: https://stackoverflow.com/questions/29503339/how-to-get-all-values-from-python-enum-class
+    """
+
+    @classmethod
+    def list(cls):
+        return list(map(lambda c: c.value, cls))
+
+class OptLocking(ExtendedEnum):
+    IGNORED = "ignored"
+    OPTIONAL = "optional"
+    REQUIRED = "required"
 
 
 class Config:
@@ -67,6 +84,17 @@ class Config:
         app_logger.info(f'config.py - security disabled')
 
     # Begin Multi-Database URLs (from ApiLogicServer add-db...)
+
+    OPT_LOCKING = OptLocking.OPTIONAL
+    if os.getenv('OPT_LOCKING'):  # e.g. export OPT_LOCKING=required
+        opt_locking_export = os.getenv('OPT_LOCKING')  # type: ignore # type: str
+        opt_locking = opt_locking_export.lower()  # type: ignore
+        if opt_locking in OptLocking.list():
+            OPT_LOCKING = opt_locking
+        else:
+            print(f'\n{__name__}: Invalid OPT_LOCKING.\n..Valid values are {OptLocking.list()}')
+            exit(1)
+        app_logger.debug(f'Opt Locking .. overridden from env variable: {OPT_LOCKING}')
 
 
     SQLALCHEMY_DATABASE_URI_AUTHENTICATION = f'sqlite:///{str(project_abs_dir.joinpath("database/authentication_db.sqlite"))}'
